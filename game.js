@@ -5,6 +5,7 @@ var bestTime = localStorage.getItem('bestTime' || Infinity);
 var bestPlayer = localStorage.getItem('bestPlayer') || 'Duje';
 var starfield = createStars();
 
+//Pokretanje igre, stvaranje svemirskog broda i prvih asteroida, pocinje se brojati vrijeme
 function startGame() {
     var pieceSize = Math.min(window.innerWidth, window.innerHeight) * 0.035;
     myGamePiece = new component(pieceSize, pieceSize, "red", window.innerWidth / 2 - 15, window.innerHeight / 2 - 15);
@@ -15,6 +16,7 @@ function startGame() {
     myGameArea.start();
 }
 
+//Stvaranje pozadine, polje sa zvijezdama
 function createStars() {
     var stars = [];
     for (var i = 0; i < 100; i++) {
@@ -34,6 +36,8 @@ function createStars() {
     return stars;
 }
 
+//Stavaranje pojedinačnog asteroida, nasumične (ali ograničene) vrijednosti:
+//veličine, brzine i smjera kretanja, početnog položaja
 function generateAsteroid() {
     var minSize = Math.min(window.innerWidth, window.innerHeight) * 0.02;
     var maxSize = Math.min(window.innerWidth, window.innerHeight) * 0.06;
@@ -79,12 +83,16 @@ function generateAsteroid() {
     asteroids.push(asteroid);
 }
 
+//Stvaranje polja asteroida pozivom funkcije generateAsteroids
 function generateAsteroids(numAsteroids) {
     for (var i = 0; i < numAsteroids; i++) {
         generateAsteroid();
     }
 }
 
+//Funkcija koja čisti cijeli ekran i zatim
+//crta zvijezde, očitava je li pritinsuta neka od strelica za micanje broda
+//provjerava koliziju pri svakom koraku te položaje asteroida i treba li ih brisati ili stvarati nove
 function updateGameArea() {
     var ctx = myGameArea.context;
     myGameArea.clear();
@@ -139,6 +147,7 @@ function updateGameArea() {
     updateTimer();
 }
 
+//Provjerava je li došlo do kolizije broda i bilo kojeg od asteroida
 function isCollision(obj1, obj2) {
     return (
         obj1.x < obj2.x + obj2.width &&
@@ -148,6 +157,10 @@ function isCollision(obj1, obj2) {
     );
 }
 
+//Funkcija zadužena za igricu nakon što dođe do kolizije, odnosno nakon što partija završi
+//generira se zvuk sudara, zaustavlja se sve na ekranu
+//računa se je li postignuto vrijeme novi rekord
+//ispisuje se prikladna poruka
 function handleCollision() {
     var collisionSound = document.getElementById("collisionSound");
     collisionSound.play();
@@ -173,6 +186,7 @@ function handleCollision() {
     ctx.fillText("Best Player: " + bestPlayer, window.innerWidth / 2 - 120, window.innerHeight / 2 + 40);
 }
 
+//varijabla zadužena za pomicanje koraka, za crtanje platna, za čekanje na ulazne tipke
 var myGameArea = {
     canvas: document.getElementById("gameCanvas"),
     keys: {},
@@ -197,6 +211,7 @@ var myGameArea = {
     }
 };
 
+//Definira kako će se formatirati vrijeme pri ispisu
 function formatTime(miliseconds) {
     var minutes = Math.floor(miliseconds / (60 * 1000));
     var seconds = Math.floor(miliseconds % (60 * 1000) / 1000);
